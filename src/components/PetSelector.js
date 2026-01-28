@@ -29,6 +29,7 @@ const PetSelector = ({ onAddPet }) => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.deleteHint}>Mantén presionado para eliminar mascota</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         {pets.map(pet => (
           <TouchableOpacity
@@ -63,6 +64,13 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.background,
     paddingVertical: 10,
+  },
+  deleteHint: {
+    fontSize: 11,
+    color: colors.textSecondary,
+    marginLeft: 10,
+    marginBottom: 5,
+    fontStyle: 'italic',
   },
   scrollContent: {
     paddingHorizontal: 10,

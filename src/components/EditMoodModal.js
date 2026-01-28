@@ -6,7 +6,8 @@ import {
   Modal, 
   TouchableOpacity, 
   ScrollView,
-  Alert
+  Alert,
+  Image
 } from 'react-native';
 import { colors } from '../theme/colors';
 import { spacing, fontSize, fontWeight, borderRadius } from '../theme/spacing';
@@ -31,6 +32,14 @@ const EditMoodModal = ({ visible, onClose, onSave, currentMood, editingMetric })
     onClose();
   };
 
+  const moodIconImages = {
+    'felicidad': require('../assets/felicidad.png'),
+    'energia': require('../assets/energia.png'),
+    'calma': require('../assets/calma.png'),
+    'jugueton': require('../assets/jugueton.png'),
+    'apetito': require('../assets/apetito.png'),
+  };
+
   const moodSettings = [
     { 
       key: 'happiness', 
@@ -38,7 +47,7 @@ const EditMoodModal = ({ visible, onClose, onSave, currentMood, editingMetric })
       value: happiness, 
       setValue: setHappiness, 
       color: colors.happy,
-      icon: '😊'
+      icon: 'felicidad'
     },
     { 
       key: 'energy', 
@@ -46,7 +55,7 @@ const EditMoodModal = ({ visible, onClose, onSave, currentMood, editingMetric })
       value: energy, 
       setValue: setEnergy, 
       color: colors.playful,
-      icon: '⚡'
+      icon: 'energia'
     },
     { 
       key: 'calmness', 
@@ -54,7 +63,7 @@ const EditMoodModal = ({ visible, onClose, onSave, currentMood, editingMetric })
       value: calmness, 
       setValue: setCalmness, 
       color: colors.calm,
-      icon: '🧘'
+      icon: 'calma'
     },
     { 
       key: 'playfulness', 
@@ -62,7 +71,7 @@ const EditMoodModal = ({ visible, onClose, onSave, currentMood, editingMetric })
       value: playfulness, 
       setValue: setPlayfulness, 
       color: colors.primary,
-      icon: '🎾'
+      icon: 'jugueton'
     },
     { 
       key: 'appetite', 
@@ -70,7 +79,7 @@ const EditMoodModal = ({ visible, onClose, onSave, currentMood, editingMetric })
       value: appetite, 
       setValue: setAppetite, 
       color: colors.walk,
-      icon: '🍖'
+      icon: 'apetito'
     },
   ];
 
@@ -101,7 +110,7 @@ const EditMoodModal = ({ visible, onClose, onSave, currentMood, editingMetric })
             {metricsToShow.map((mood) => (
               <View key={mood.key} style={styles.sliderContainer}>
                 <View style={styles.sliderHeader}>
-                  <Text style={styles.sliderIcon}>{mood.icon}</Text>
+                  <Image source={moodIconImages[mood.icon]} style={styles.sliderIcon} resizeMode="contain" />
                   <Text style={styles.sliderLabel}>{mood.label}</Text>
                   <Text style={[styles.sliderValue, { color: mood.color }]}>
                     {Math.round(mood.value)}%
@@ -202,7 +211,8 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   sliderIcon: {
-    fontSize: 24,
+    width: 24,
+    height: 24,
     marginRight: spacing.sm,
   },
   sliderLabel: {

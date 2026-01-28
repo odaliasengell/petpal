@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
 import { spacing, fontSize, fontWeight, borderRadius } from '../theme/spacing';
@@ -63,10 +63,16 @@ const HealthHistoryScreen = () => {
   };
 
   const categoryIcons = {
-    vaccine: '💉',
+    vaccine: 'vacuna',
     checkup: '✓',
-    treatment: '💊',
-    consultation: '🏥',
+    treatment: 'tratamiento',
+    consultation: 'veterinario',
+  };
+
+  const categoryIconImages = {
+    'vacuna': require('../assets/vacuna.png'),
+    'tratamiento': require('../assets/tratamiento.png'),
+    'veterinario': require('../assets/veterinario.png'),
   };
 
   return (
@@ -95,7 +101,7 @@ const HealthHistoryScreen = () => {
           <View style={styles.summaryCard}>
             <View style={styles.summaryItem}>
               <View style={[styles.summaryIcon, { backgroundColor: colors.vaccine + '20' }]}>
-                <Text style={styles.summaryIconText}>💉</Text>
+                <Image source={require('../assets/vacuna.png')} style={styles.summaryIconImage} resizeMode="contain" />
               </View>
               <Text style={styles.summaryValue}>{summary.vaccines}</Text>
               <Text style={styles.summaryLabel}>Vacunas</Text>
@@ -103,7 +109,7 @@ const HealthHistoryScreen = () => {
 
             <View style={styles.summaryItem}>
               <View style={[styles.summaryIcon, { backgroundColor: colors.vet + '20' }]}>
-                <Text style={styles.summaryIconText}>🏥</Text>
+                <Image source={require('../assets/veterinario.png')} style={styles.summaryIconImage} resizeMode="contain" />
               </View>
               <Text style={styles.summaryValue}>{summary.consultations}</Text>
               <Text style={styles.summaryLabel}>Consultas</Text>
@@ -111,7 +117,7 @@ const HealthHistoryScreen = () => {
 
             <View style={styles.summaryItem}>
               <View style={[styles.summaryIcon, { backgroundColor: colors.treatment + '20' }]}>
-                <Text style={styles.summaryIconText}>💊</Text>
+                <Image source={require('../assets/tratamiento.png')} style={styles.summaryIconImage} resizeMode="contain" />
               </View>
               <Text style={styles.summaryValue}>{summary.treatments}</Text>
               <Text style={styles.summaryLabel}>Tratamientos</Text>
@@ -130,7 +136,9 @@ const HealthHistoryScreen = () => {
               <Text style={styles.emptySubtext}>Presiona "+ Agregar" para crear tu primer registro médico</Text>
             </View>
           ) : (
-            <View style={styles.timeline}>
+            <>
+              <Text style={styles.deleteHint}>Mantén presionado para eliminar</Text>
+              <View style={styles.timeline}>
               {healthHistory.map((item, index) => (
                 <TouchableOpacity 
                   key={item.id} 
@@ -153,9 +161,17 @@ const HealthHistoryScreen = () => {
                   <View style={styles.eventCard}>
                     <View style={styles.eventHeader}>
                       <View style={styles.eventHeaderLeft}>
-                        <Text style={styles.eventIcon}>
-                          {categoryIcons[item.category]}
-                        </Text>
+                        {categoryIconImages[categoryIcons[item.category]] ? (
+                          <Image 
+                            source={categoryIconImages[categoryIcons[item.category]]} 
+                            style={styles.eventIconImage} 
+                            resizeMode="contain" 
+                          />
+                        ) : (
+                          <Text style={styles.eventIcon}>
+                            {categoryIcons[item.category]}
+                          </Text>
+                        )}
                         <View>
                           <Text style={styles.eventTitle}>{item.title}</Text>
                           <Text style={styles.eventDate}>{item.date}</Text>
@@ -181,6 +197,7 @@ const HealthHistoryScreen = () => {
                 </TouchableOpacity>
               ))}
             </View>
+            </>
           )}
         </View>
 
@@ -240,6 +257,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     marginBottom: spacing.xl,
   },
+  deleteHint: {
+    fontSize: 11,
+    color: colors.textSecondary,
+    marginBottom: spacing.sm,
+    fontStyle: 'italic',
+  },
   summaryCard: {
     flexDirection: 'row',
     backgroundColor: colors.background,
@@ -261,6 +284,10 @@ const styles = StyleSheet.create({
   },
   summaryIconText: {
     fontSize: 28,
+  },
+  summaryIconImage: {
+    width: 28,
+    height: 28,
   },
   summaryValue: {
     fontSize: fontSize.xxl,
@@ -316,6 +343,11 @@ const styles = StyleSheet.create({
   },
   eventIcon: {
     fontSize: 32,
+    marginRight: spacing.md,
+  },
+  eventIconImage: {
+    width: 32,
+    height: 32,
     marginRight: spacing.md,
   },
   eventTitle: {

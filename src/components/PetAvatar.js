@@ -24,7 +24,7 @@ const PetAvatar = ({ source, size, style }) => {
         />
       ) : (
         <View style={[styles.placeholder, { width: avatarSize, height: avatarSize, borderRadius: avatarSize / 2 }]}>
-          <Text style={[styles.icon, { fontSize: avatarSize * 0.5 }]}>🐕</Text>
+          <Image source={require('../assets/perro.png')} style={[styles.icon, { width: avatarSize * 0.5, height: avatarSize * 0.5 }]} resizeMode="contain" />
         </View>
       )}
     </View>

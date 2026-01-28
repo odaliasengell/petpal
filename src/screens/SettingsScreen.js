@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView, Image } from 'react-native';
 import StorageService from '../services/StorageService';
-import { colors } from '../theme';
+import { colors } from '../theme/colors';
+import { spacing, fontSize, fontWeight, borderRadius } from '../theme/spacing';
+import { useAuth } from '../contexts/AuthContext';
 
 /**
  * SettingsScreen - Pantalla de configuración
  * 
- * Proporciona opciones para gestionar el almacenamiento de datos
+ * Proporciona opciones para gestionar el almacenamiento de datos y sesión
  */
 const SettingsScreen = () => {
   const [storageSize, setStorageSize] = useState('0');
+  const { currentUser, logout } = useAuth();
 
   const handleClearData = () => {
     Alert.alert(
@@ -54,11 +57,55 @@ const SettingsScreen = () => {
     Alert.alert('📊 Tamaño de almacenamiento', `${size} KB`);
   };
 
+  const handleLogout = () => {
+    Alert.alert(
+      '🚪 Cerrar Sesión',
+      '¿Estás seguro de que quieres cerrar sesión?',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel'
+        },
+        {
+          text: 'Cerrar Sesión',
+          style: 'destructive',
+          onPress: async () => {
+            const result = await logout();
+            if (result.success) {
+              Alert.alert('✅ Sesión cerrada', 'Has cerrado sesión correctamente');
+            }
+          }
+        }
+      ]
+    );
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>⚙️ Configuración</Text>
         <Text style={styles.subtitle}>Gestión de datos y almacenamiento</Text>
+        {currentUser && (
+          <View style={styles.userInfo}>
+            <Text style={styles.userInfoText}>👤 {currentUser.username}</Text>
+            <Text style={styles.userInfoEmail}>{currentUser.email}</Text>
+          </View>
+        )}
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Cuenta</Text>
+        
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleLogout}
+        >
+          <Text style={styles.buttonIcon}>🚪</Text>
+          <View style={styles.buttonContent}>
+            <Text style={styles.buttonText}>Cerrar Sesión</Text>
+            <Text style={styles.buttonSubtext}>Salir de tu cuenta</Text>
+          </View>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.section}>
@@ -110,7 +157,7 @@ const SettingsScreen = () => {
           style={[styles.button, styles.dangerButton]}
           onPress={handleClearData}
         >
-          <Text style={styles.buttonIcon}>🗑️</Text>
+          <Image source={require('../assets/eliminar.png')} style={styles.buttonIcon} resizeMode="contain" />
           <View style={styles.buttonContent}>
             <Text style={[styles.buttonText, styles.dangerText]}>
               Eliminar todos los datos
@@ -137,29 +184,46 @@ const SettingsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.backgroundSecondary,
   },
   header: {
-    padding: 20,
+    padding: spacing.xl,
     paddingTop: 60,
     backgroundColor: colors.primary,
   },
   title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: colors.white,
-    marginBottom: 5,
+    fontSize: fontSize.xxxl,
+    fontWeight: fontWeight.bold,
+    color: colors.textWhite,
+    marginBottom: spacing.xs,
   },
   subtitle: {
-    fontSize: 16,
-    color: colors.white,
+    fontSize: fontSize.lg,
+    color: colors.textWhite,
     opacity: 0.9,
   },
+  userInfo: {
+    marginTop: spacing.lg,
+    paddingTop: spacing.lg,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  userInfoText: {
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.semibold,
+    color: colors.textWhite,
+    marginBottom: spacing.xs,
+  },
+  userInfoEmail: {
+    fontSize: fontSize.md,
+    color: colors.textWhite,
+    opacity: 0.8,
+  },
   section: {
-    margin: 20,
-    padding: 20,
-    backgroundColor: colors.white,
-    borderRadius: 15,
+    margin: spacing.xl,
+    padding: spacing.xl,
+    backgroundColor: colors.background,
+    borderRadius: borderRadius.lg,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -167,39 +231,40 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginBottom: 8,
+    fontSize: fontSize.xl,
+    fontWeight: fontWeight.bold,
+    color: colors.textPrimary,
+    marginBottom: spacing.sm,
   },
   sectionDescription: {
-    fontSize: 14,
+    fontSize: fontSize.md,
     color: colors.textSecondary,
-    marginBottom: 20,
+    marginBottom: spacing.lg,
   },
   button: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 15,
-    backgroundColor: colors.lightGray,
-    borderRadius: 12,
-    marginBottom: 12,
+    padding: spacing.lg,
+    backgroundColor: colors.backgroundSecondary,
+    borderRadius: borderRadius.lg,
+    marginBottom: spacing.md,
   },
   buttonIcon: {
-    fontSize: 24,
-    marginRight: 15,
+    width: fontSize.xxl,
+    height: fontSize.xxl,
+    marginRight: spacing.lg,
   },
   buttonContent: {
     flex: 1,
   },
   buttonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 2,
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.semibold,
+    color: colors.textPrimary,
+    marginBottom: spacing.xs,
   },
   buttonSubtext: {
-    fontSize: 12,
+    fontSize: fontSize.sm,
     color: colors.textSecondary,
   },
   dangerButton: {
@@ -211,16 +276,16 @@ const styles = StyleSheet.create({
     color: '#D32F2F',
   },
   info: {
-    margin: 20,
+    margin: spacing.xl,
     marginTop: 0,
-    padding: 15,
+    padding: spacing.lg,
     backgroundColor: '#E3F2FD',
-    borderRadius: 12,
+    borderRadius: borderRadius.lg,
   },
   infoText: {
-    fontSize: 13,
+    fontSize: fontSize.sm,
     color: '#1565C0',
-    marginBottom: 8,
+    marginBottom: spacing.sm,
     lineHeight: 20,
   },
 });

@@ -1,6 +1,7 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import AppNavigator from './src/navigation/AppNavigator';
+import { AuthProvider } from './src/contexts/AuthContext';
 import { PetProvider } from './src/contexts/PetContext';
 
 // Reactotron - Solo en desarrollo
@@ -10,9 +11,11 @@ if (__DEV__) {
 
 export default function App() {
   return (
-    <PetProvider>
-      <AppNavigator />
-      <StatusBar style="dark" />
-    </PetProvider>
+    <AuthProvider>
+      <PetProvider>
+        <AppNavigator />
+        <StatusBar style="dark" />
+      </PetProvider>
+    </AuthProvider>
   );
 }

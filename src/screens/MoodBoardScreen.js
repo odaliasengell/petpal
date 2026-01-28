@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
 import { spacing, fontSize, fontWeight, borderRadius } from '../theme/spacing';
@@ -65,37 +65,45 @@ const MoodBoardScreen = () => {
       label: 'Felicidad',
       value: happiness,
       color: colors.happy,
-      icon: '😊',
+      icon: 'felicidad',
     },
     {
       id: 2,
       label: 'Energía',
       value: energy,
       color: colors.playful,
-      icon: '⚡',
+      icon: 'energia',
     },
     {
       id: 3,
       label: 'Calma',
       value: calmness,
       color: colors.calm,
-      icon: '🧘',
+      icon: 'calma',
     },
     {
       id: 4,
       label: 'Juguetón',
       value: playfulness,
       color: colors.primary,
-      icon: '🎾',
+      icon: 'jugueton',
     },
     {
       id: 5,
       label: 'Apetito',
       value: appetite,
       color: colors.walk,
-      icon: '🍖',
+      icon: 'apetito',
     },
   ];
+
+  const moodIconImages = {
+    'felicidad': require('../assets/felicidad.png'),
+    'energia': require('../assets/energia.png'),
+    'calma': require('../assets/calma.png'),
+    'jugueton': require('../assets/jugueton.png'),
+    'apetito': require('../assets/apetito.png'),
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -164,14 +172,13 @@ const MoodBoardScreen = () => {
             >
               <View style={styles.metricHeader}>
                 <View style={styles.metricIcon}>
-                  <Text style={styles.metricIconText}>{mood.icon}</Text>
+                  <Image source={moodIconImages[mood.icon]} style={styles.metricIconImage} resizeMode="contain" />
                 </View>
                 <View style={styles.metricInfo}>
                   <Text style={styles.metricLabel}>{mood.label}</Text>
                   <Text style={styles.metricValue}>{mood.value}%</Text>
                 </View>
                 <View style={styles.editIndicator}>
-                  <Text style={styles.editIndicatorIcon}>✏️</Text>
                   <Text style={styles.editIndicatorText}>Editar</Text>
                 </View>
               </View>
@@ -369,6 +376,10 @@ const styles = StyleSheet.create({
   },
   metricIconText: {
     fontSize: 24,
+  },
+  metricIconImage: {
+    width: 28,
+    height: 28,
   },
   metricInfo: {
     flex: 1,

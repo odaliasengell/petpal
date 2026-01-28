@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
-  StyleSheet, 
+  StyleSheet,
+  Image, 
   Modal, 
   TextInput, 
   TouchableOpacity, 
@@ -86,7 +87,7 @@ const EditModal = ({ visible, onClose, onSave, field, value, title }) => {
                   <Text style={[styles.dateButtonText, !editedValue && styles.placeholderText]}>
                     {editedValue || 'Seleccionar fecha'}
                   </Text>
-                  <Text style={styles.calendarIcon}>📅</Text>
+                  <Image source={require('../assets/calendario.png')} style={styles.calendarIcon} resizeMode="contain" />
                 </TouchableOpacity>
                 
                 {showDatePicker && (
@@ -212,7 +213,8 @@ const styles = StyleSheet.create({
     color: '#999',
   },
   calendarIcon: {
-    fontSize: 20,
+    width: 20,
+    height: 20,
   },
   buttonContainer: {
     flexDirection: 'row',

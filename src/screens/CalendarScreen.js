@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
 import { spacing, fontSize, fontWeight, borderRadius } from '../theme/spacing';
@@ -237,7 +237,7 @@ const CalendarScreen = () => {
               style={styles.emptyState}
               onPress={() => setModalVisible(true)}
             >
-              <Text style={styles.emptyStateIcon}>📅</Text>
+              <Image source={require('../assets/calendario.png')} style={styles.emptyStateIcon} resizeMode="contain" />
               <Text style={styles.emptyStateText}>No hay eventos programados</Text>
               <Text style={styles.emptyStateSubtext}>Toca para agregar uno</Text>
             </TouchableOpacity>
@@ -454,7 +454,8 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   emptyStateIcon: {
-    fontSize: 48,
+    width: 48,
+    height: 48,
     marginBottom: spacing.md,
   },
   emptyStateText: {

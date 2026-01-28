@@ -3,6 +3,7 @@ import {
   Modal,
   View,
   Text,
+  Image,
   TextInput,
   TouchableOpacity,
   StyleSheet,
@@ -108,7 +109,7 @@ const AddPetModal = ({ visible, onClose }) => {
         <Text style={[styles.dateButtonText, !formData.fechaNacimiento && styles.placeholderText]}>
           {formData.fechaNacimiento || 'Seleccionar fecha'}
         </Text>
-        <Text style={styles.calendarIcon}>📅</Text>
+        <Image source={require('../assets/calendario.png')} style={styles.calendarIcon} resizeMode="contain" />
       </TouchableOpacity>
       
       {showDatePicker && (
@@ -327,7 +328,8 @@ const styles = StyleSheet.create({
     color: '#999',
   },
   calendarIcon: {
-    fontSize: 20,
+    width: 20,
+    height: 20,
   },
   inputWithUnit: {
     position: 'relative',

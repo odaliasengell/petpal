@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../theme/colors';
 import { fontWeight, borderRadius } from '../theme/spacing';
@@ -34,13 +34,29 @@ const DashboardScreen = () => {
     return descriptors.length > 0 ? descriptors.join(' y ') : 'Estado Normal';
   };
 
+  const moodImages = {
+    'felicidad': require('../assets/felicidad.png'),
+    'energia': require('../assets/energia.png'),
+    'calma': require('../assets/calma.png'),
+    'jugueton': require('../assets/jugueton.png'),
+    'apetito': require('../assets/apetito.png'),
+  };
+
+  const moodLabels = {
+    'felicidad': 'Felicidad',
+    'energia': 'Energía',
+    'calma': 'Calma',
+    'jugueton': 'Juguetón',
+    'apetito': 'Apetito',
+  };
+
   // Filtrar solo las métricas que tienen valor
   const activeMoods = [
-    { value: happiness, color: colors.happy, label: '😊 Felicidad', key: 'happiness' },
-    { value: energy, color: colors.playful, label: '⚡ Energía', key: 'energy' },
-    { value: calmness, color: colors.calm, label: '🧘 Calma', key: 'calmness' },
-    { value: playfulness, color: colors.primary, label: '🎾 Juguetón', key: 'playfulness' },
-    { value: appetite, color: colors.walk, label: '🍖 Apetito', key: 'appetite' },
+    { value: happiness, color: colors.happy, label: 'felicidad', key: 'happiness' },
+    { value: energy, color: colors.playful, label: 'energia', key: 'energy' },
+    { value: calmness, color: colors.calm, label: 'calma', key: 'calmness' },
+    { value: playfulness, color: colors.primary, label: 'jugueton', key: 'playfulness' },
+    { value: appetite, color: colors.walk, label: 'apetito', key: 'apetito' },
   ].filter(mood => mood.value > 0);
 
   return (
@@ -60,11 +76,23 @@ const DashboardScreen = () => {
         <PetSelector onAddPet={() => setShowAddPetModal(true)} />
 
         {/* Pet Avatar Section */}
-        <View style={styles.avatarSection}>
-          <PetAvatar source={petPhoto} />
-          <Text style={styles.petName}>{petInfo.nombre}</Text>
-          <Badge label={petInfo.especie} color={colors.primary} />
-        </View>
+        {petInfo ? (
+          <View style={styles.avatarSection}>
+            <PetAvatar source={petPhoto} />
+            <Text style={styles.petName}>{petInfo.nombre}</Text>
+            <Badge label={petInfo.especie} color={colors.primary} />
+          </View>
+        ) : (
+          <View style={styles.avatarSection}>
+            <Text style={styles.emptyStateText}>Agrega tu primera mascota</Text>
+            <TouchableOpacity 
+              style={styles.addPetButton}
+              onPress={() => setShowAddPetModal(true)}
+            >
+              <Text style={styles.addPetButtonText}>+ Agregar Mascota</Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
         {/* Estado Emocional Card - Innovador */}
         <View style={styles.section}>
@@ -93,7 +121,10 @@ const DashboardScreen = () => {
                     {activeMoods.map((mood) => (
                       <View key={mood.key} style={styles.legendItem}>
                         <View style={[styles.legendDot, { backgroundColor: mood.color }]} />
-                        <Text style={styles.legendText}>{mood.label} ({mood.value}%)</Text>
+                        {moodImages[mood.label] && (
+                          <Image source={moodImages[mood.label]} style={styles.legendIcon} resizeMode="contain" />
+                        )}
+                        <Text style={styles.legendText}>{moodLabels[mood.label]} ({mood.value}%)</Text>
                       </View>
                     ))}
                   </View>
@@ -121,19 +152,19 @@ const DashboardScreen = () => {
           <InfoCard 
             title="Última Vacuna"
             value="Hace 2 meses"
-            icon="💉"
+            icon="vacuna"
             color={colors.vaccine}
           />
           <InfoCard 
             title="Próxima Cita"
             value="En 5 días"
-            icon="📅"
+            icon="calendario"
             color={colors.vet}
           />
           <InfoCard 
             title="Peso Actual"
             value="8.5 kg"
-            icon="⚖️"
+            icon="peso"
             color={colors.primary}
           />
         </View>
@@ -146,7 +177,7 @@ const DashboardScreen = () => {
               style={[styles.quickAccessCard, { backgroundColor: colors.vaccine + '20' }]}
               onPress={() => navigation.navigate('Calendar')}
             >
-              <Text style={styles.quickAccessIcon}>📅</Text>
+              <Image source={require('../assets/calendario.png')} style={styles.quickAccessIcon} resizeMode="contain" />
               <Text style={styles.quickAccessText}>Calendario</Text>
             </TouchableOpacity>
 
@@ -154,7 +185,7 @@ const DashboardScreen = () => {
               style={[styles.quickAccessCard, { backgroundColor: colors.vet + '20' }]}
               onPress={() => navigation.navigate('Health')}
             >
-              <Text style={styles.quickAccessIcon}>🏥</Text>
+              <Image source={require('../assets/salud.png')} style={styles.quickAccessIcon} resizeMode="contain" />
               <Text style={styles.quickAccessText}>Salud</Text>
             </TouchableOpacity>
 
@@ -162,7 +193,7 @@ const DashboardScreen = () => {
               style={[styles.quickAccessCard, { backgroundColor: colors.walk + '20' }]}
               onPress={() => navigation.navigate('Gallery')}
             >
-              <Text style={styles.quickAccessIcon}>📸</Text>
+              <Image source={require('../assets/foto.png')} style={styles.quickAccessIcon} resizeMode="contain" />
               <Text style={styles.quickAccessText}>Galería</Text>
             </TouchableOpacity>
 
@@ -170,7 +201,7 @@ const DashboardScreen = () => {
               style={[styles.quickAccessCard, { backgroundColor: colors.primary + '20' }]}
               onPress={() => navigation.navigate('Profile')}
             >
-              <Text style={styles.quickAccessIcon}>🐾</Text>
+              <Image source={require('../assets/perro.png')} style={styles.quickAccessIcon} resizeMode="contain" />
               <Text style={styles.quickAccessText}>Perfil</Text>
             </TouchableOpacity>
           </View>
@@ -279,6 +310,10 @@ const styles = StyleSheet.create({
     height: 12,
     borderRadius: 6,
   },
+  legendIcon: {
+    width: 16,
+    height: 16,
+  },
   legendText: {
     fontSize: responsiveFontSize.xs,
     color: colors.textSecondary,
@@ -325,13 +360,32 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   quickAccessIcon: {
-    fontSize: scaleWidth(32),
+    width: scaleWidth(32),
+    height: scaleWidth(32),
     marginBottom: responsiveSpacing.sm,
   },
   quickAccessText: {
     fontSize: responsiveFontSize.md,
     fontWeight: fontWeight.semibold,
     color: colors.textPrimary,
+  },
+  emptyStateText: {
+    fontSize: responsiveFontSize.lg,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: responsiveSpacing.md,
+  },
+  addPetButton: {
+    backgroundColor: colors.primary,
+    paddingVertical: responsiveSpacing.md,
+    paddingHorizontal: responsiveSpacing.xl,
+    borderRadius: borderRadius.full,
+    marginTop: responsiveSpacing.sm,
+  },
+  addPetButtonText: {
+    color: colors.textWhite,
+    fontSize: responsiveFontSize.md,
+    fontWeight: fontWeight.semibold,
   },
 });
 

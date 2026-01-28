@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { colors } from '../theme/colors';
 import { spacing, fontSize, fontWeight, borderRadius } from '../theme/spacing';
 
@@ -8,10 +8,23 @@ import { spacing, fontSize, fontWeight, borderRadius } from '../theme/spacing';
  * Evita re-renders innecesarios cuando las props no cambian
  */
 const InfoCard = React.memo(({ title, value, icon, color = colors.primary, onPress }) => {
+  // Determinar si el icono es una imagen o emoji
+  const iconImages = {
+    'vacuna': require('../assets/vacuna.png'),
+    'peso': require('../assets/peso.png'),
+    'calendario': require('../assets/calendario.png'),
+  };
+  
+  const isImageIcon = iconImages[icon];
+  
   const content = (
     <View style={styles.card}>
       <View style={[styles.iconContainer, { backgroundColor: color + '20' }]}>
-        <Text style={[styles.icon, { color }]}>{icon}</Text>
+        {isImageIcon ? (
+          <Image source={iconImages[icon]} style={styles.iconImage} resizeMode="contain" />
+        ) : (
+          <Text style={[styles.icon, { color }]}>{icon}</Text>
+        )}
       </View>
       <View style={styles.textContainer}>
         <Text style={styles.title}>{title}</Text>
@@ -51,6 +64,10 @@ const styles = StyleSheet.create({
   },
   icon: {
     fontSize: fontSize.xl,
+  },
+  iconImage: {
+    width: 28,
+    height: 28,
   },
   textContainer: {
     flex: 1,

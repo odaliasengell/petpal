@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from './AuthContext';
 
 /**
  * PetContext - Contexto global para compartir datos de la mascota
@@ -7,25 +8,20 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
  * Permite que la foto de perfil y otros datos se compartan
  * entre diferentes pantallas de la aplicación.
  * Todos los datos se guardan automáticamente en AsyncStorage
+ * Ahora con soporte multi-usuario: cada usuario tiene sus propios datos
  */
 const PetContext = createContext();
 
-// Claves de almacenamiento
-const STORAGE_KEYS = {
-  PETS: '@PetPal:pets',
-  ACTIVE_PET_ID: '@PetPal:activePetId',
-  CALENDAR_EVENTS: '@PetPal:calendarEvents',
-  MOOD_DATA: '@PetPal:moodData',
-  MOOD_HISTORY: '@PetPal:moodHistory',
-  HEALTH_HISTORY: '@PetPal:healthHistory',
-  GALLERY_PHOTOS: '@PetPal:galleryPhotos',
-  ALBUMS: '@PetPal:albums',
+// Función para generar claves de almacenamiento por usuario
+const getUserStorageKey = (userId, dataType) => {
+  return `@PetPal:user_${userId}:${dataType}`;
 };
 
 export const PetProvider = ({ children }) => {
+  const { currentUser } = useAuth();
   // Estados iniciales vacíos - se cargarán desde AsyncStorage
   const [pets, setPets] = useState([]);
-  const [activePetId, setActivePetId] = useState('1');
+  const [activePetId, setActivePetId] = useState(null);
   const [petCalendarEvents, setPetCalendarEvents] = useState({});
   const [petMoodData, setPetMoodData] = useState({});
   const [petMoodHistory, setPetMoodHistory] = useState({});
@@ -33,27 +29,6 @@ export const PetProvider = ({ children }) => {
   const [petGalleryPhotos, setPetGalleryPhotos] = useState({});
   const [petAlbums, setPetAlbums] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-
-  // Datos por defecto para inicializar
-  const defaultPets = [
-    {
-      id: '1',
-      nombre: 'Luna',
-      especie: 'Perro',
-      raza: 'Golden Retriever',
-      edad: '3 años',
-      fechaNacimiento: '15 de Marzo, 2021',
-      peso: '8.5 kg',
-      altura: '55 cm',
-      veterinario: 'Dr. Carlos Méndez',
-      clinica: 'Clínica Veterinaria Pet Care',
-      telefono: '(555) 123-4567',
-      microchip: '982000123456789',
-      placa: 'PET-2024-001',
-      notas: 'Luna es una perrita muy activa y juguetona. Le encanta correr en el parque y jugar con otros perros. Es importante mantener su rutina de ejercicio diario. Tiene alergia leve al pollo, usar alimento especial hipoalergénico.',
-      photo: null,
-    }
-  ];
 
   // ========== FUNCIONES DE ALMACENAMIENTO ==========
   
@@ -77,10 +52,17 @@ export const PetProvider = ({ children }) => {
     }
   };
 
-  // Cargar todos los datos al iniciar la app
+  // Cargar todos los datos al iniciar la app o cuando cambie el usuario
   useEffect(() => {
+    // Solo cargar datos si hay un usuario autenticado
+    if (!currentUser) {
+      setIsLoading(false);
+      return;
+    }
+
     const loadAllData = async () => {
       try {
+        const userId = currentUser.id;
         const [
           savedPets,
           savedActivePetId,
@@ -91,18 +73,18 @@ export const PetProvider = ({ children }) => {
           savedGalleryPhotos,
           savedAlbums,
         ] = await Promise.all([
-          loadFromStorage(STORAGE_KEYS.PETS, defaultPets),
-          loadFromStorage(STORAGE_KEYS.ACTIVE_PET_ID, '1'),
-          loadFromStorage(STORAGE_KEYS.CALENDAR_EVENTS, {}),
-          loadFromStorage(STORAGE_KEYS.MOOD_DATA, {}),
-          loadFromStorage(STORAGE_KEYS.MOOD_HISTORY, {}),
-          loadFromStorage(STORAGE_KEYS.HEALTH_HISTORY, {}),
-          loadFromStorage(STORAGE_KEYS.GALLERY_PHOTOS, {}),
-          loadFromStorage(STORAGE_KEYS.ALBUMS, {}),
+          loadFromStorage(getUserStorageKey(userId, 'pets'), []), // Usuario nuevo empieza sin mascotas
+          loadFromStorage(getUserStorageKey(userId, 'activePetId'), null),
+          loadFromStorage(getUserStorageKey(userId, 'calendarEvents'), {}),
+          loadFromStorage(getUserStorageKey(userId, 'moodData'), {}),
+          loadFromStorage(getUserStorageKey(userId, 'moodHistory'), {}),
+          loadFromStorage(getUserStorageKey(userId, 'healthHistory'), {}),
+          loadFromStorage(getUserStorageKey(userId, 'galleryPhotos'), {}),
+          loadFromStorage(getUserStorageKey(userId, 'albums'), {}),
         ]);
 
         setPets(savedPets);
-        setActivePetId(savedActivePetId);
+        setActivePetId(savedActivePetId || (savedPets.length > 0 ? savedPets[0].id : null));
         setPetCalendarEvents(savedCalendarEvents);
         setPetMoodData(savedMoodData);
         setPetMoodHistory(savedMoodHistory);
@@ -111,71 +93,72 @@ export const PetProvider = ({ children }) => {
         setPetAlbums(savedAlbums);
       } catch (error) {
         console.error('Error cargando datos:', error);
-        // Si hay error, usar datos por defecto
-        setPets(defaultPets);
+        // Si hay error, empezar con datos vacíos
+        setPets([]);
+        setActivePetId(null);
       } finally {
         setIsLoading(false);
       }
     };
 
     loadAllData();
-  }, []);
+  }, [currentUser]); // Recargar cuando cambie el usuario
 
   // Guardar pets cada vez que cambien
   useEffect(() => {
-    if (!isLoading && pets.length > 0) {
-      saveToStorage(STORAGE_KEYS.PETS, pets);
+    if (!isLoading && pets.length > 0 && currentUser) {
+      saveToStorage(getUserStorageKey(currentUser.id, 'pets'), pets);
     }
-  }, [pets, isLoading]);
+  }, [pets, isLoading, currentUser]);
 
   // Guardar activePetId cada vez que cambie
   useEffect(() => {
-    if (!isLoading) {
-      saveToStorage(STORAGE_KEYS.ACTIVE_PET_ID, activePetId);
+    if (!isLoading && currentUser && activePetId) {
+      saveToStorage(getUserStorageKey(currentUser.id, 'activePetId'), activePetId);
     }
-  }, [activePetId, isLoading]);
+  }, [activePetId, isLoading, currentUser]);
 
   // Guardar calendar events cada vez que cambien
   useEffect(() => {
-    if (!isLoading) {
-      saveToStorage(STORAGE_KEYS.CALENDAR_EVENTS, petCalendarEvents);
+    if (!isLoading && currentUser) {
+      saveToStorage(getUserStorageKey(currentUser.id, 'calendarEvents'), petCalendarEvents);
     }
-  }, [petCalendarEvents, isLoading]);
+  }, [petCalendarEvents, isLoading, currentUser]);
 
   // Guardar mood data cada vez que cambie
   useEffect(() => {
-    if (!isLoading) {
-      saveToStorage(STORAGE_KEYS.MOOD_DATA, petMoodData);
+    if (!isLoading && currentUser) {
+      saveToStorage(getUserStorageKey(currentUser.id, 'moodData'), petMoodData);
     }
-  }, [petMoodData, isLoading]);
+  }, [petMoodData, isLoading, currentUser]);
 
   // Guardar mood history cada vez que cambie
   useEffect(() => {
-    if (!isLoading) {
-      saveToStorage(STORAGE_KEYS.MOOD_HISTORY, petMoodHistory);
+    if (!isLoading && currentUser) {
+      saveToStorage(getUserStorageKey(currentUser.id, 'moodHistory'), petMoodHistory);
     }
-  }, [petMoodHistory, isLoading]);
+  }, [petMoodHistory, isLoading, currentUser]);
 
   // Guardar health history cada vez que cambie
   useEffect(() => {
-    if (!isLoading) {
-      saveToStorage(STORAGE_KEYS.HEALTH_HISTORY, petHealthHistory);
+    if (!isLoading && currentUser) {
+      saveToStorage(getUserStorageKey(currentUser.id, 'healthHistory'), petHealthHistory);
     }
-  }, [petHealthHistory, isLoading]);
+  }, [petHealthHistory, isLoading, currentUser]);
 
   // Guardar gallery photos cada vez que cambien
   useEffect(() => {
-    if (!isLoading) {
-      saveToStorage(STORAGE_KEYS.GALLERY_PHOTOS, petGalleryPhotos);
+    if (!isLoading && currentUser) {
+      saveToStorage(getUserStorageKey(currentUser.id, 'galleryPhotos'), petGalleryPhotos);
     }
-  }, [petGalleryPhotos, isLoading]);
+  }, [petGalleryPhotos, isLoading, currentUser]);
 
   // Guardar albums cada vez que cambien
   useEffect(() => {
-    if (!isLoading) {
-      saveToStorage(STORAGE_KEYS.ALBUMS, petAlbums);
+    if (!isLoading && currentUser) {
+      saveToStorage(getUserStorageKey(currentUser.id, 'albums'), petAlbums);
     }
-  }, [petAlbums, isLoading]);
+  }, [petAlbums, isLoading, currentUser]);
 
   // ========== FIN FUNCIONES DE ALMACENAMIENTO ==========
 
@@ -219,6 +202,12 @@ export const PetProvider = ({ children }) => {
       photo: null,
     };
     setPets([...pets, newPet]);
+    
+    // Si es la primera mascota, establecerla como activa
+    if (pets.length === 0) {
+      setActivePetId(newPet.id);
+    }
+    
     return newPet.id;
   };
 
@@ -401,11 +390,7 @@ export const PetProvider = ({ children }) => {
     });
   };
 
-  // Mostrar un indicador de carga mientras se cargan los datos
-  if (isLoading) {
-    return null; // o un componente de carga si lo tienes
-  }
-
+  // Renderizar siempre, pero los datos estarán vacíos si no hay usuario
   return (
     <PetContext.Provider value={{ 
       // Multi-pet management

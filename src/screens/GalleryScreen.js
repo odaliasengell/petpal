@@ -307,7 +307,7 @@ const GalleryScreen = () => {
           onPress={handleTakePhoto}
           activeOpacity={0.7}
         >
-          <Text style={styles.uploadIcon}>📷</Text>
+          <Image source={require('../assets/foto.png')} style={styles.uploadIcon} resizeMode="contain" />
           <Text style={styles.uploadButtonText}>Tomar Foto</Text>
         </TouchableOpacity>
 
@@ -316,7 +316,7 @@ const GalleryScreen = () => {
           onPress={handleUploadPhoto}
           activeOpacity={0.7}
         >
-          <Text style={styles.uploadIcon}>🖼️</Text>
+          <Image source={require('../assets/galeria.png')} style={styles.uploadIcon} resizeMode="contain" />
           <Text style={styles.uploadButtonTextSecondary}>Subir desde Galería</Text>
         </TouchableOpacity>
       </View>
@@ -340,7 +340,7 @@ const GalleryScreen = () => {
               styles.albumChipText,
               selectedAlbum === 'all' && styles.albumChipTextActive
             ]}>
-              📁 Todas ({galleryPhotos.length})
+              <Image source={require('../assets/galeria.png')} style={styles.albumChipIcon} resizeMode="contain" /> Todas ({galleryPhotos.length})
             </Text>
           </TouchableOpacity>
 
@@ -355,7 +355,7 @@ const GalleryScreen = () => {
               styles.albumChipText,
               selectedAlbum === 'favorites' && styles.albumChipTextActive
             ]}>
-              ❤️ Favoritas ({favoriteCount})
+              <Image source={require('../assets/favoritos.png')} style={styles.albumChipIcon} resizeMode="contain" /> Favoritas ({favoriteCount})
             </Text>
           </TouchableOpacity>
 
@@ -372,7 +372,7 @@ const GalleryScreen = () => {
                 styles.albumChipText,
                 selectedAlbum === album.id && styles.albumChipTextActive
               ]}>
-                📂 {album.name}
+                <Image source={require('../assets/albums.png')} style={styles.albumChipIcon} resizeMode="contain" /> {album.name}
               </Text>
             </TouchableOpacity>
           ))}
@@ -385,6 +385,9 @@ const GalleryScreen = () => {
           title={selectedAlbum === 'all' ? 'Todas las Fotos' : selectedAlbum === 'favorites' ? 'Favoritas' : albums.find(a => a.id === selectedAlbum)?.name || 'Fotos'}
           subtitle={`${filteredPhotos.length} foto${filteredPhotos.length !== 1 ? 's' : ''}`}
         />
+        {filteredPhotos.length > 0 && (
+          <Text style={styles.deleteHint}>Da click para visualizar la foto</Text>
+        )}
       </View>
     </>
   );
@@ -392,7 +395,7 @@ const GalleryScreen = () => {
   // Componente cuando no hay fotos
   const ListEmptyComponent = () => (
     <View style={styles.emptyState}>
-      <Text style={styles.emptyIcon}>📸</Text>
+      <Image source={require('../assets/foto.png')} style={styles.emptyIcon} resizeMode="contain" />
       <Text style={styles.emptyText}>No hay fotos aquí</Text>
       <Text style={styles.emptySubtext}>
         {selectedAlbum === 'favorites' 
@@ -419,7 +422,6 @@ const GalleryScreen = () => {
             style={styles.photoCard}
             activeOpacity={0.8}
             onPress={() => handleImagePress(photo)}
-            onLongPress={() => handlePhotoLongPress(photo)}
           >
             <Image 
               source={{ uri: photo.uri }} 
@@ -428,7 +430,7 @@ const GalleryScreen = () => {
             />
             {photo.isFavorite && (
               <View style={styles.favoriteIndicator}>
-                <Text style={styles.favoriteIcon}>❤️</Text>
+                <Image source={require('../assets/favoritos.png')} style={styles.favoriteIcon} resizeMode="contain" />
               </View>
             )}
             <View style={styles.photoOverlay}>
@@ -562,9 +564,11 @@ const GalleryScreen = () => {
                       toggleFavorite(selectedImage.id);
                     }}
                   >
-                    <Text style={styles.imageActionIcon}>
-                      {selectedImage.isFavorite ? '❤️' : '🤍'}
-                    </Text>
+                    <Image 
+                      source={selectedImage.isFavorite ? require('../assets/favoritos.png') : require('../assets/favoritos.png')} 
+                      style={[styles.imageActionIcon, !selectedImage.isFavorite && { opacity: 0.3 }]} 
+                      resizeMode="contain" 
+                    />
                     <Text style={styles.imageActionText}>
                       {selectedImage.isFavorite ? 'Favorita' : 'Favorito'}
                     </Text>
@@ -578,7 +582,7 @@ const GalleryScreen = () => {
                       setSelectAlbumModalVisible(true);
                     }}
                   >
-                    <Text style={styles.imageActionIcon}>📂</Text>
+                    <Image source={require('../assets/albums.png')} style={styles.imageActionIcon} resizeMode="contain" />
                     <Text style={styles.imageActionText}>Álbum</Text>
                   </TouchableOpacity>
 
@@ -600,7 +604,7 @@ const GalleryScreen = () => {
                       );
                     }}
                   >
-                    <Text style={styles.imageActionIcon}>🗑️</Text>
+                    <Image source={require('../assets/eliminar.png')} style={styles.imageActionIcon} resizeMode="contain" />
                     <Text style={styles.imageActionText}>Eliminar</Text>
                   </TouchableOpacity>
                 </View>
@@ -680,6 +684,12 @@ const styles = StyleSheet.create({
   section: {
     paddingHorizontal: spacing.lg,
     marginBottom: spacing.xl,
+  },
+  deleteHint: {
+    fontSize: 11,
+    color: colors.textSecondary,
+    marginTop: spacing.xs,
+    fontStyle: 'italic',
   },
   specialMomentsScroll: {
     paddingRight: spacing.lg,
@@ -818,7 +828,8 @@ const styles = StyleSheet.create({
     shadowColor: colors.border,
   },
   uploadIcon: {
-    fontSize: 24,
+    width: 24,
+    height: 24,
     marginRight: spacing.md,
   },
   uploadButtonText: {
@@ -844,7 +855,8 @@ const styles = StyleSheet.create({
     padding: spacing.xs,
   },
   favoriteIcon: {
-    fontSize: 16,
+    width: 16,
+    height: 16,
   },
   albumsScroll: {
     paddingRight: spacing.lg,
@@ -870,13 +882,19 @@ const styles = StyleSheet.create({
   albumChipTextActive: {
     color: colors.background,
   },
+  albumChipIcon: {
+    width: 16,
+    height: 16,
+    marginRight: 4,
+  },
   emptyState: {
     alignItems: 'center',
     paddingVertical: spacing.xxl,
     paddingHorizontal: spacing.lg,
   },
   emptyIcon: {
-    fontSize: 64,
+    width: 64,
+    height: 64,
     marginBottom: spacing.md,
   },
   emptyText: {
@@ -974,17 +992,19 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 50,
     right: 20,
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 10,
+    borderWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   closeImageViewerText: {
-    fontSize: 24,
-    color: colors.textWhite,
+    fontSize: 28,
+    color: '#FFFFFF',
     fontWeight: fontWeight.bold,
   },
   fullImage: {
@@ -1026,7 +1046,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(231, 76, 60, 0.3)',
   },
   imageActionIcon: {
-    fontSize: 24,
+    width: 24,
+    height: 24,
     marginBottom: spacing.xs,
   },
   imageActionText: {

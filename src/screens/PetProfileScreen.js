@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { colors } from '../theme/colors';
@@ -242,6 +242,19 @@ const PetProfileScreen = () => {
    * Guarda los cambios del campo editado
    */
   const handleSave = (field, value) => {
+    // Validación para edad máxima de 80
+    if (field === 'edad') {
+      const edadNum = parseInt(value);
+      if (isNaN(edadNum) || edadNum < 0) {
+        Alert.alert('Error', 'Por favor ingresa una edad válida.');
+        return;
+      }
+      if (edadNum > 80) {
+        Alert.alert('Error', 'La edad máxima permitida es 80 años.');
+        return;
+      }
+    }
+    
     updatePetInfo({ [field]: value });
     Alert.alert('¡Actualizado!', 'La información ha sido actualizada correctamente.');
   };
@@ -265,7 +278,7 @@ const PetProfileScreen = () => {
           >
             <PetAvatar size={160} source={petPhoto} />
             <View style={styles.changePhotoButton}>
-              <Text style={styles.changePhotoIcon}>📸</Text>
+              <Image source={require('../assets/foto.png')} style={styles.changePhotoIcon} resizeMode="contain" />
             </View>
           </TouchableOpacity>
           <Text style={styles.petName}>{petInfo.nombre}</Text>
@@ -290,7 +303,7 @@ const PetProfileScreen = () => {
               <Text style={styles.infoLabel}>Nombre</Text>
               <View style={styles.infoValueContainer}>
                 <Text style={styles.infoValue}>{petInfo.nombre}</Text>
-                <Text style={styles.editIcon}>✏️</Text>
+                <Text style={styles.editText}>Editar</Text>
               </View>
             </TouchableOpacity>
             <View style={styles.divider} />
@@ -301,7 +314,7 @@ const PetProfileScreen = () => {
               <Text style={styles.infoLabel}>Especie</Text>
               <View style={styles.infoValueContainer}>
                 <Text style={styles.infoValue}>{petInfo.especie}</Text>
-                <Text style={styles.editIcon}>✏️</Text>
+                <Text style={styles.editText}>Editar</Text>
               </View>
             </TouchableOpacity>
             <View style={styles.divider} />
@@ -312,7 +325,7 @@ const PetProfileScreen = () => {
               <Text style={styles.infoLabel}>Raza</Text>
               <View style={styles.infoValueContainer}>
                 <Text style={styles.infoValue}>{petInfo.raza}</Text>
-                <Text style={styles.editIcon}>✏️</Text>
+                <Text style={styles.editText}>Editar</Text>
               </View>
             </TouchableOpacity>
             <View style={styles.divider} />
@@ -323,7 +336,7 @@ const PetProfileScreen = () => {
               <Text style={styles.infoLabel}>Edad</Text>
               <View style={styles.infoValueContainer}>
                 <Text style={styles.infoValue}>{petInfo.edad}</Text>
-                <Text style={styles.editIcon}>✏️</Text>
+                <Text style={styles.editText}>Editar</Text>
               </View>
             </TouchableOpacity>
             <View style={styles.divider} />
@@ -334,7 +347,7 @@ const PetProfileScreen = () => {
               <Text style={styles.infoLabel}>Fecha de Nacimiento</Text>
               <View style={styles.infoValueContainer}>
                 <Text style={styles.infoValue}>{petInfo.fechaNacimiento}</Text>
-                <Text style={styles.editIcon}>✏️</Text>
+                <Text style={styles.editText}>Editar</Text>
               </View>
             </TouchableOpacity>
           </Card>
@@ -351,7 +364,7 @@ const PetProfileScreen = () => {
               <Text style={styles.infoLabel}>Peso</Text>
               <View style={styles.infoValueContainer}>
                 <Text style={styles.infoValue}>{petInfo.peso}</Text>
-                <Text style={styles.editIcon}>✏️</Text>
+                <Text style={styles.editText}>Editar</Text>
               </View>
             </TouchableOpacity>
             <View style={styles.divider} />
@@ -362,7 +375,7 @@ const PetProfileScreen = () => {
               <Text style={styles.infoLabel}>Altura</Text>
               <View style={styles.infoValueContainer}>
                 <Text style={styles.infoValue}>{petInfo.altura}</Text>
-                <Text style={styles.editIcon}>✏️</Text>
+                <Text style={styles.editText}>Editar</Text>
               </View>
             </TouchableOpacity>
             <View style={styles.divider} />
@@ -387,10 +400,10 @@ const PetProfileScreen = () => {
           >
             <Card style={styles.vetCard}>
               <View style={styles.vetIcon}>
-                <Text style={styles.vetIconText}>🏥</Text>
+                <Image source={require('../assets/veterinario.png')} style={styles.vetIconImage} resizeMode="contain" />
               </View>
               <Text style={styles.vetName}>{petInfo.veterinario}</Text>
-              <Text style={styles.editIconSmall}>✏️ Editar</Text>
+              <Text style={styles.editTextSmall}>Editar</Text>
             </Card>
           </TouchableOpacity>
           <TouchableOpacity 
@@ -401,7 +414,7 @@ const PetProfileScreen = () => {
               <Text style={styles.vetInfoLabel}>Clínica</Text>
               <View style={styles.infoValueContainer}>
                 <Text style={styles.vetInfoValue}>{petInfo.clinica}</Text>
-                <Text style={styles.editIcon}>✏️</Text>
+                <Text style={styles.editText}>Editar</Text>
               </View>
             </Card>
           </TouchableOpacity>
@@ -413,7 +426,7 @@ const PetProfileScreen = () => {
               <Text style={styles.vetInfoLabel}>Teléfono</Text>
               <View style={styles.infoValueContainer}>
                 <Text style={styles.vetContact}>📞 {petInfo.telefono}</Text>
-                <Text style={styles.editIcon}>✏️</Text>
+                <Text style={styles.editText}>Editar</Text>
               </View>
             </Card>
           </TouchableOpacity>
@@ -430,7 +443,7 @@ const PetProfileScreen = () => {
               <Text style={styles.notesText}>
                 {petInfo.notas}
               </Text>
-              <Text style={styles.editIconNote}>✏️ Editar notas</Text>
+              <Text style={styles.editTextNote}>Editar notas</Text>
             </Card>
           </TouchableOpacity>
         </View>
@@ -446,7 +459,7 @@ const PetProfileScreen = () => {
               <Text style={styles.infoLabel}>Microchip</Text>
               <View style={styles.infoValueContainer}>
                 <Text style={styles.infoValue}>{petInfo.microchip}</Text>
-                <Text style={styles.editIcon}>✏️</Text>
+                <Text style={styles.editText}>Editar</Text>
               </View>
             </TouchableOpacity>
             <View style={styles.divider} />
@@ -457,7 +470,7 @@ const PetProfileScreen = () => {
               <Text style={styles.infoLabel}>Placa</Text>
               <View style={styles.infoValueContainer}>
                 <Text style={styles.infoValue}>{petInfo.placa}</Text>
-                <Text style={styles.editIcon}>✏️</Text>
+                <Text style={styles.editText}>Editar</Text>
               </View>
             </TouchableOpacity>
           </Card>
@@ -519,7 +532,8 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   changePhotoIcon: {
-    fontSize: 24,
+    width: 24,
+    height: 24,
   },
   petName: {
     fontSize: fontSize.xxl,
@@ -577,13 +591,31 @@ const styles = StyleSheet.create({
     fontSize: fontSize.sm,
     opacity: 0.6,
   },
+  editText: {
+    fontSize: fontSize.sm,
+    color: colors.primary,
+    fontWeight: fontWeight.medium,
+  },
   editIconSmall: {
     fontSize: fontSize.sm,
     color: colors.primary,
     marginTop: spacing.xs,
     fontWeight: fontWeight.medium,
   },
+  editTextSmall: {
+    fontSize: fontSize.sm,
+    color: colors.primary,
+    marginTop: spacing.xs,
+    fontWeight: fontWeight.medium,
+  },
   editIconNote: {
+    fontSize: fontSize.sm,
+    color: colors.primary,
+    marginTop: spacing.md,
+    fontWeight: fontWeight.medium,
+    textAlign: 'right',
+  },
+  editTextNote: {
     fontSize: fontSize.sm,
     color: colors.primary,
     marginTop: spacing.md,
@@ -615,6 +647,10 @@ const styles = StyleSheet.create({
   },
   vetIconText: {
     fontSize: 40,
+  },
+  vetIconImage: {
+    width: 40,
+    height: 40,
   },
   vetName: {
     fontSize: fontSize.xl,

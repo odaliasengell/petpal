@@ -3,6 +3,7 @@ import {
   Modal,
   View,
   Text,
+  Image,
   StyleSheet,
   TextInput,
   TouchableOpacity,
@@ -22,11 +23,17 @@ const AddHealthRecordModal = ({ visible, onClose, onSave }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
 
+  const categoryIconImages = {
+    'vacuna': require('../assets/vacuna.png'),
+    'tratamiento': require('../assets/tratamiento.png'),
+    'veterinario': require('../assets/veterinario.png'),
+  };
+
   const categories = [
-    { id: 'vaccine', label: 'Vacuna', icon: '💉', color: colors.vaccine },
+    { id: 'vaccine', label: 'Vacuna', icon: 'vacuna', color: colors.vaccine },
     { id: 'checkup', label: 'Control', icon: '✓', color: colors.primary },
-    { id: 'treatment', label: 'Tratamiento', icon: '💊', color: colors.treatment },
-    { id: 'consultation', label: 'Consulta', icon: '🏥', color: colors.vet },
+    { id: 'treatment', label: 'Tratamiento', icon: 'tratamiento', color: colors.treatment },
+    { id: 'consultation', label: 'Consulta', icon: 'veterinario', color: colors.vet },
   ];
 
   const handleSave = () => {
@@ -109,7 +116,7 @@ const AddHealthRecordModal = ({ visible, onClose, onSave }) => {
                 style={styles.dateButton}
                 onPress={() => setShowDatePicker(true)}
               >
-                <Text style={styles.dateButtonIcon}>📅</Text>
+                <Image source={require('../assets/calendario.png')} style={styles.dateButtonIcon} resizeMode="contain" />
                 <Text style={styles.dateButtonText}>{formatDate(selectedDate)}</Text>
               </TouchableOpacity>
               {showDatePicker && (
@@ -139,7 +146,15 @@ const AddHealthRecordModal = ({ visible, onClose, onSave }) => {
                     ]}
                     onPress={() => setCategory(cat.id)}
                   >
-                    <Text style={styles.categoryIcon}>{cat.icon}</Text>
+                    {categoryIconImages[cat.icon] ? (
+                      <Image 
+                        source={categoryIconImages[cat.icon]} 
+                        style={styles.categoryIconImage} 
+                        resizeMode="contain" 
+                      />
+                    ) : (
+                      <Text style={styles.categoryIcon}>{cat.icon}</Text>
+                    )}
                     <Text
                       style={[
                         styles.categoryLabel,
@@ -266,7 +281,8 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   dateButtonIcon: {
-    fontSize: 20,
+    width: 20,
+    height: 20,
   },
   dateButtonText: {
     fontSize: fontSize.md,
@@ -295,6 +311,10 @@ const styles = StyleSheet.create({
   },
   categoryIcon: {
     fontSize: 18,
+  },
+  categoryIconImage: {
+    width: 18,
+    height: 18,
   },
   categoryLabel: {
     fontSize: fontSize.sm,
