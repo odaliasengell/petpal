@@ -28,6 +28,21 @@ const PetProfileScreen = () => {
     requestPermissions();
   }, []);
 
+  // Si no hay mascota, mostrar mensaje
+  if (!petInfo) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyEmoji}>🐾</Text>
+          <Text style={styles.emptyTitle}>No hay mascotas</Text>
+          <Text style={styles.emptyMessage}>
+            Agrega tu primera mascota en el Dashboard para ver su perfil
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   /**
    * Solicita permisos de galería y cámara (capacidad nativa)
    */
@@ -692,6 +707,28 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     lineHeight: 24,
     fontWeight: fontWeight.regular,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: spacing.xl,
+  },
+  emptyEmoji: {
+    fontSize: 80,
+    marginBottom: spacing.lg,
+  },
+  emptyTitle: {
+    fontSize: fontSize.xxl,
+    fontWeight: fontWeight.bold,
+    color: colors.textPrimary,
+    marginBottom: spacing.sm,
+  },
+  emptyMessage: {
+    fontSize: fontSize.md,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 24,
   },
 });
 

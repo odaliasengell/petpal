@@ -284,7 +284,7 @@ const CalendarScreen = () => {
               ))
           ) : (
             <View style={styles.emptyState}>
-              <Text style={styles.emptyStateIcon}>📋</Text>
+              <Image source={require('../assets/documentos.png')} style={styles.emptyStateIconImage} resizeMode="contain" />
               <Text style={styles.emptyStateText}>No hay eventos programados</Text>
               <Text style={styles.emptyStateSubtext}>Agrega eventos al calendario</Text>
             </View>
@@ -509,6 +509,11 @@ const styles = StyleSheet.create({
   upcomingEventTime: {
     fontSize: fontSize.sm,
     color: colors.textSecondary,
+  },
+  emptyStateIconImage: {
+    width: 64,
+    height: 64,
+    marginBottom: spacing.md,
   },
 });
 

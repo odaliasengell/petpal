@@ -23,13 +23,19 @@ export const AuthProvider = ({ children }) => {
   const checkLoginStatus = async () => {
     try {
       const userId = await AsyncStorage.getItem('currentUserId');
+      console.log('🔍 Verificando sesión - User ID:', userId);
       if (userId) {
         const usersData = await AsyncStorage.getItem('users');
         const users = usersData ? JSON.parse(usersData) : [];
         const user = users.find(u => u.id === userId);
         if (user) {
+          console.log('✅ Usuario encontrado:', user.username || user.email);
           setCurrentUser(user);
+        } else {
+          console.log('⚠️ Usuario no encontrado en la base de datos');
         }
+      } else {
+        console.log('ℹ️ No hay sesión activa');
       }
     } catch (error) {
       console.error('Error al verificar sesión:', error);
@@ -94,6 +100,7 @@ export const AuthProvider = ({ children }) => {
       }
 
       // Guardar sesión
+      console.log('🔐 Iniciando sesión para:', user.username || user.email, 'ID:', user.id);
       await AsyncStorage.setItem('currentUserId', user.id);
       setCurrentUser(user);
 
@@ -106,6 +113,7 @@ export const AuthProvider = ({ children }) => {
   // Cerrar sesión
   const logout = async () => {
     try {
+      console.log('👋 Cerrando sesión de:', currentUser?.username || currentUser?.email);
       await AsyncStorage.removeItem('currentUserId');
       setCurrentUser(null);
       return { success: true };

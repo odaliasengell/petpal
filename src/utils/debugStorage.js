@@ -1,111 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 /**
- * StorageService - Servicio de utilidades para gestionar AsyncStorage
- * 
- * Proporciona funciones útiles para administrar el almacenamiento local
+ * Utilidad de depuración para AsyncStorage
+ * Ayuda a identificar problemas de datos compartidos entre usuarios
  */
 
-const STORAGE_KEYS = {
-  PETS: '@PetPal:pets',
-  ACTIVE_PET_ID: '@PetPal:activePetId',
-  CALENDAR_EVENTS: '@PetPal:calendarEvents',
-  MOOD_DATA: '@PetPal:moodData',
-  MOOD_HISTORY: '@PetPal:moodHistory',
-  HEALTH_HISTORY: '@PetPal:healthHistory',
-  GALLERY_PHOTOS: '@PetPal:galleryPhotos',
-  ALBUMS: '@PetPal:albums',
-};
-
-/**
- * Limpia todos los datos almacenados de la aplicación
- * Útil para resetear la app o durante el desarrollo
- */
-export const clearAllData = async () => {
-  try {
-    const keys = Object.values(STORAGE_KEYS);
-    await AsyncStorage.multiRemove(keys);
-    console.log('✅ Todos los datos han sido eliminados');
-    return true;
-  } catch (error) {
-    console.error('❌ Error al limpiar datos:', error);
-    return false;
-  }
-};
-
-/**
- * Exporta todos los datos como JSON
- * Útil para hacer backups
- */
-export const exportData = async () => {
-  try {
-    const keys = Object.values(STORAGE_KEYS);
-    const data = await AsyncStorage.multiGet(keys);
-    
-    const exportedData = {};
-    data.forEach(([key, value]) => {
-      if (value) {
-        exportedData[key] = JSON.parse(value);
-      }
-    });
-    
-    console.log('✅ Datos exportados exitosamente');
-    return exportedData;
-  } catch (error) {
-    console.error('❌ Error al exportar datos:', error);
-    return null;
-  }
-};
-
-/**
- * Importa datos desde un objeto JSON
- * Útil para restaurar backups
- */
-export const importData = async (data) => {
-  try {
-    const pairs = Object.entries(data).map(([key, value]) => [
-      key,
-      JSON.stringify(value)
-    ]);
-    
-    await AsyncStorage.multiSet(pairs);
-    console.log('✅ Datos importados exitosamente');
-    return true;
-  } catch (error) {
-    console.error('❌ Error al importar datos:', error);
-    return false;
-  }
-};
-
-/**
- * Obtiene el tamaño aproximado del almacenamiento usado
- */
-export const getStorageSize = async () => {
-  try {
-    const keys = Object.values(STORAGE_KEYS);
-    const data = await AsyncStorage.multiGet(keys);
-    
-    let totalSize = 0;
-    data.forEach(([, value]) => {
-      if (value) {
-        totalSize += value.length;
-      }
-    });
-    
-    // Convertir a KB
-    const sizeInKB = (totalSize / 1024).toFixed(2);
-    console.log(`📊 Tamaño de almacenamiento: ${sizeInKB} KB`);
-    return sizeInKB;
-  } catch (error) {
-    console.error('❌ Error al calcular tamaño:', error);
-    return 0;
-  }
-};
-
-/**
- * Obtiene todos los datos almacenados para debugging
- * Muestra información detallada por usuario
- */
 export const debugStorage = async () => {
   try {
     console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
@@ -174,18 +73,40 @@ export const debugStorage = async () => {
     }
 
     console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
-    
-    return true;
   } catch (error) {
     console.error('❌ Error en debugStorage:', error);
-    return null;
   }
 };
 
-export default {
-  clearAllData,
-  exportData,
-  importData,
-  getStorageSize,
-  debugStorage,
+/**
+ * Elimina TODOS los datos de TODOS los usuarios (usar con cuidado)
+ */
+export const clearAllUserData = async () => {
+  try {
+    console.log('⚠️ Eliminando TODOS los datos...');
+    await AsyncStorage.clear();
+    console.log('✅ Todos los datos han sido eliminados');
+  } catch (error) {
+    console.error('❌ Error al eliminar datos:', error);
+  }
+};
+
+/**
+ * Elimina solo los datos de un usuario específico
+ */
+export const clearUserData = async (userId) => {
+  try {
+    console.log(`🧹 Eliminando datos del usuario ${userId}...`);
+    const allKeys = await AsyncStorage.getAllKeys();
+    const userKeys = allKeys.filter(key => key.includes(`user_${userId}`));
+    
+    if (userKeys.length > 0) {
+      await AsyncStorage.multiRemove(userKeys);
+      console.log(`✅ ${userKeys.length} claves eliminadas para el usuario ${userId}`);
+    } else {
+      console.log('ℹ️ No se encontraron datos para este usuario');
+    }
+  } catch (error) {
+    console.error('❌ Error al eliminar datos del usuario:', error);
+  }
 };

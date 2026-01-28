@@ -131,7 +131,7 @@ const HealthHistoryScreen = () => {
           
           {healthHistory.length === 0 ? (
             <View style={styles.emptyState}>
-              <Text style={styles.emptyIcon}>📋</Text>
+              <Image source={require('../assets/documentos.png')} style={styles.emptyIconImage} resizeMode="contain" />
               <Text style={styles.emptyText}>No hay registros aún</Text>
               <Text style={styles.emptySubtext}>Presiona "+ Agregar" para crear tu primer registro médico</Text>
             </View>
@@ -438,6 +438,11 @@ const styles = StyleSheet.create({
   },
   emptyIcon: {
     fontSize: 64,
+    marginBottom: spacing.md,
+  },
+  emptyIconImage: {
+    width: 64,
+    height: 64,
     marginBottom: spacing.md,
   },
   emptyText: {

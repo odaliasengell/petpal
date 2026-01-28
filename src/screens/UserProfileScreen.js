@@ -559,6 +559,11 @@ const styles = StyleSheet.create({
     height: 60,
     marginBottom: spacing.md,
   },
+  noPetsIconImage: {
+    width: 48,
+    height: 48,
+    marginBottom: spacing.md,
+  },
   noPetsed: {
     fontSize: fontSize.sm,
     color: colors.textSecondary,

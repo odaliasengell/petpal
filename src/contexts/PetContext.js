@@ -54,15 +54,27 @@ export const PetProvider = ({ children }) => {
 
   // Cargar todos los datos al iniciar la app o cuando cambie el usuario
   useEffect(() => {
-    // Solo cargar datos si hay un usuario autenticado
+    // Si no hay usuario autenticado, limpiar todos los datos
     if (!currentUser) {
+      console.log('🧹 Limpiando datos - No hay usuario autenticado');
+      setPets([]);
+      setActivePetId(null);
+      setPetCalendarEvents({});
+      setPetMoodData({});
+      setPetMoodHistory({});
+      setPetHealthHistory({});
+      setPetGalleryPhotos({});
+      setPetAlbums({});
       setIsLoading(false);
       return;
     }
 
     const loadAllData = async () => {
       try {
+        setIsLoading(true);
         const userId = currentUser.id;
+        console.log('📊 Cargando datos para usuario:', userId, currentUser.username || currentUser.email);
+        
         const [
           savedPets,
           savedActivePetId,
@@ -83,6 +95,8 @@ export const PetProvider = ({ children }) => {
           loadFromStorage(getUserStorageKey(userId, 'albums'), {}),
         ]);
 
+        console.log('✅ Datos cargados - Mascotas:', savedPets.length);
+        
         setPets(savedPets);
         setActivePetId(savedActivePetId || (savedPets.length > 0 ? savedPets[0].id : null));
         setPetCalendarEvents(savedCalendarEvents);
@@ -96,6 +110,12 @@ export const PetProvider = ({ children }) => {
         // Si hay error, empezar con datos vacíos
         setPets([]);
         setActivePetId(null);
+        setPetCalendarEvents({});
+        setPetMoodData({});
+        setPetMoodHistory({});
+        setPetHealthHistory({});
+        setPetGalleryPhotos({});
+        setPetAlbums({});
       } finally {
         setIsLoading(false);
       }
